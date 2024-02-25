@@ -4,54 +4,12 @@ import Webcam from "react-webcam";
 import {isMobile} from 'react-device-detect';
 import style from "../styles/Home.module.css";
 import { useState, useRef, useEffect } from "react";
+import axios from 'axios';
 
-import { GestureRecognizer, FilesetResolver } from "@mediapipe/tasks-vision";
+import { createGestureRecognizer } from "@/utils/gestureRecognizer";
+import { determineCount } from "@/utils/fingerCount";
 
 const inter = Inter({ subsets: ["latin"] });
-
-const createGestureRecognizer = async () => {
-    const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-    let gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
-        baseOptions: {
-            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
-            delegate: "GPU"
-        },
-        runningMode: "VIDEO"
-      });
-    return gestureRecognizer;
-}
-
-const determineCount = (results) => {
-    let fingerCount = 0;
-    if (results.landmarks) {
-        fingerCount = 0;
-    
-        for (const landmarks of results.landmarks) {
-            const handedness = results.handednesses[0][0].displayName;
-            if (handedness == "Left" && landmarks[4].x > landmarks[3].x) {
-                fingerCount++;
-            }
-            if (handedness == "Right" && landmarks[4].x < landmarks[3].x) {
-                fingerCount++;
-            }
-    
-            if (landmarks[8].y < landmarks[6].y) {
-                fingerCount++;
-            }
-            if (landmarks[12].y < landmarks[10].y) {
-                fingerCount++;
-            }
-            if (landmarks[16].y < landmarks[14].y) {
-                fingerCount++;
-            }
-            if (landmarks[20].y < landmarks[18].y) {
-                fingerCount++;
-            }
-        }
-    }
-
-    return fingerCount;
-}
 
 export default function Home() {
     const [fingerCount, setFingerCount] = useState(0);
@@ -92,6 +50,13 @@ export default function Home() {
             }, 500);
         })
     }, []);
+
+    // API call
+    fingerCount != 0 ? axios.post('/api/hand_gesture', {
+        finger: fingerCount
+    }).then((res) => {
+        console.log("Gesture recorded");
+    }) : null;
 
     return (
         <>
