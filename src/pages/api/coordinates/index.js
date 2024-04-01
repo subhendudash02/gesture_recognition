@@ -3,19 +3,18 @@ import { supabase } from '@/utils/supabaseClient';
 export default async function coord(req, res) {
     if (req.method == 'GET') {
         const { data, error } = await supabase.from('coordinates').select('*');
-        let ans = {};
+        let ans = [];
 
         for (let i = 0; i < data.length; i++) {
-            ans[data[i].name] = {
-                "x": data[i].x,
-                "y": data[i].y
-            }
+            // ans[data[i].name] = {
+            //     "x": data[i].x,
+            //     "y": data[i].y
+            // }
+            ans.push(data[i].x);
+            ans.push(data[i].y);
         }
 
-        res.status(200).json({
-            "status": "ok",
-            "data": ans 
-        });
+        res.status(200).send(ans);
     }
 
     else if (req.method == 'POST') {
