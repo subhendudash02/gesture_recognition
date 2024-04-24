@@ -2,9 +2,10 @@ import { supabase } from '@/utils/supabaseClient';
 
 export default async function handler(req, res) {
     if (req.method == 'GET') {
-        const { data, error } = await supabase.from('component_log').select('*');
+        const { data, error } = await supabase.from('component_log').select('*').order('id', { ascending: true });
+        console.log(data);
         res.status(200).json({
-            "finger": data[0].finger
+            "finger": data[data.length - 1].finger
         });
     }
     else if (req.method == 'POST') {
