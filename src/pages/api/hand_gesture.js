@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     if (req.method == 'GET') {
         const { data, error } = await supabase.from('component_log').select('*');
         res.status(200).json({
-            "finger": data[data.length - 1].finger
+            "finger": data[0].finger
         });
     }
     else if (req.method == 'POST') {
