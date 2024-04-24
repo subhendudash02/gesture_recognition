@@ -2,10 +2,13 @@ import { supabase } from '@/utils/supabaseClient';
 
 export default async function handler(req, res) {
     if (req.method == 'GET') {
+        let obj = "";
         const { data, error } = await supabase.from('component_log').select('*').order('id', { ascending: true });
         console.log(data);
+        let finger = data[data.length - 1].finger;
         res.status(200).json({
-            "finger": data[data.length - 1].finger
+            "finger": finger,
+            "obj": finger == 1 ? "Scissors" : finger == 2 ? "Knife" : finger == 3 ? "Retract" : "None"
         });
     }
     else if (req.method == 'POST') {
